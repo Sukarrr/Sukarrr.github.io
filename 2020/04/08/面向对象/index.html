@@ -6,22 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>mysql中的事务 | Hexo</title>
+  <title>面向对象 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="事务：一组原子性的SQL查询">
+  <meta name="description" content="OOP面向对象程序设计">
 <meta property="og:type" content="article">
-<meta property="og:title" content="mysql中的事务">
-<meta property="og:url" content="http://yoursite.com/2020/04/01/mysql%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1/index.html">
+<meta property="og:title" content="面向对象">
+<meta property="og:url" content="http://yoursite.com/2020/04/08/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="事务：一组原子性的SQL查询">
+<meta property="og:description" content="OOP面向对象程序设计">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://yoursite.com/assets/shiwugeli.png">
-<meta property="article:published_time" content="2020-04-01T04:30:18.000Z">
-<meta property="article:modified_time" content="2020-04-01T07:24:40.551Z">
+<meta property="og:image" content="http://yoursite.com/assets/uml%E7%AC%A6%E5%8F%B7.png">
+<meta property="article:published_time" content="2020-04-08T14:47:30.000Z">
+<meta property="article:modified_time" content="2020-04-08T16:55:32.669Z">
 <meta property="article:author" content="Sukar">
-<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="java">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://yoursite.com/assets/shiwugeli.png">
+<meta name="twitter:image" content="http://yoursite.com/assets/uml%E7%AC%A6%E5%8F%B7.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -147,66 +147,35 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-mysql中的事务" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-面向对象" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      mysql中的事务
+      面向对象
     </h1>
   
 
         
-        <a href="/2020/04/01/mysql%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1/" class="archive-article-date">
-  	<time datetime="2020-04-01T04:30:18.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-01</time>
+        <a href="/2020/04/08/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" class="archive-article-date">
+  	<time datetime="2020-04-08T14:47:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-08</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>事务：一组原子性的SQL查询</p>
+        <p>OOP面向对象程序设计 </p>
 <a id="more"></a>
-
-<ul>
-<li><p><strong>事务的ACID属性</strong> </p>
-<ol>
-<li>原子性（atomicity)一个事务必须被视为一个不可分割的最小工作单元，整个事务中的所有操作要么全部提交成功，要么全部失败回滚。 </li>
-<li>一致性（consistency)数据库总是从一个一致性的状态转换到另外一个一致性的状态。（保证事务的完整性，准确性） </li>
-<li>隔离性（isolation)通常来说，一个事务所做的修改在最终提交以前，对其他事务是不可见的。 </li>
-<li>持久性（durability)一旦事务提交，则其所做的修改就会永久保存到数据库中。此时即使系统崩溃，修改的数据也不会丢失。</li>
-</ol>
-</li>
-<li><p><strong>事务的创建</strong> </p>
-<ol>
-<li>隐式事务：事务没有明显的开启和结束标志<br>比如select、insert、update、delete语句</li>
-<li>显式事务<br>前提：必须先设置自动提交功能为禁用<br>步骤1：开启事务<br>set autocommit=0;<br>start transaction;可选的<br>步骤2：编写sql语句<br>步骤3：结束事务<br>commit；提交事务<br>rollback；回滚事务<br>（要结合具体应用场景，mysql只能单独提交或回滚）  </li>
-</ol>
-</li>
-<li><p><strong>各种并发问题</strong>  </p>
-<ul>
-<li>脏读<br>在事务A修改数据之后<strong>提交数据之前</strong>，这时另一个事务B来读取数据，如果不加控制，事务B读取到A修改过数据，之后A回滚，B读取到的内容是临时且无效的，此过程称为脏读Dirty Read。  </li>
-<li>不可重复读<br>对于两个事务A,B，A读取了一个字段，然后B<strong>更新</strong>了该字段之后A再次读取同一字段值就不同了。  </li>
-<li>幻读<br>对于两个事务A,B，A从一个表中读取了一个字段，然后B在该表中<strong>插入</strong>了一些新的行之后，如果A再次读取同一个表就会多出几行  </li>
-</ul>
-</li>
-<li><p><strong>数据库的隔离性</strong>  </p>
-<ul>
-<li>oracle支持的2种事务隔离级别：READ COMMITED（默认）,SERIALIZABLE  </li>
-<li>mysql支持4种事务隔离级别：REPEATABLE READ（默认）<br><img src="/assets/shiwugeli.png" alt="">  </li>
-</ul>
-</li>
-<li><p>查看隔离级别<br>select @@tx_isolation;  </p>
-</li>
-<li><p>设置隔离级别<br>set session|global transaction isolation level 隔离级别;  </p>
-</li>
-<li><p>savepoint的使用</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SET autocommit&#x3D;0;</span><br><span class="line">START TRANSACTION;</span><br><span class="line">sql;</span><br><span class="line">SAVEPOINT a;#设置保存点</span><br><span class="line">sql;</span><br><span class="line">ROLLBACK TO a;#回滚到保存点</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
+<h3 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h3><p>将数据和行为组合在一个包中，并对对象的使用者隐藏了数据的实现方式。<br>实现封装的关键在于绝对不能让类中的方法直接地访问其他类的实例域。程序仅通过对象的方法与对象的数据进行交互。<br>封装的好处：可以改变内部实现，除了该类的方法之外，不会影响其他代码；更改器方法可以执行错误检查，然而直接对域进行赋值将不会进行这些处理。<br>注意不要编写返回引用可变对象的访问器方法。 </p>
+<h3 id="类之间的关系"><a href="#类之间的关系" class="headerlink" title="类之间的关系"></a>类之间的关系</h3><p>依赖：uses-a 如果一个类的方法操纵另一个类的对象，我们就说一个类依赖于另一个类<br>应尽可能将相互依赖的类减至最少（耦合度最小）<br>聚合：has-a 类A的对象包含类B的对象<br><img src="/assets/uml%E7%AC%A6%E5%8F%B7.png" alt=""><br>继承：is-a 表示特殊与一般关系。 </p>
+<h3 id="方法参数"><a href="#方法参数" class="headerlink" title="方法参数"></a>方法参数</h3><p>一个方法不能修改一个基本数据类型的参数（即数值型或布尔型）<br>一个方法可以改变一个对象参数的状态<br>一个方法不能让对象参数引用一个新的对象 </p>
+<h3 id="类设计技巧"><a href="#类设计技巧" class="headerlink" title="类设计技巧"></a>类设计技巧</h3><p>1.一定要保证数据私有<br>2.一定要对数据初始化<br>3.不要在类中使用过多的基本类型<br>4.不是所有的域都需要独立的域访问器和域更改器<br>5.将职责过多的类进行分解<br>6.类名和方法名要能够体现它们的职责<br>7.优先使用不可变的类 </p>
+<h3 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h3><p>this：引用隐式参数；调用该类其他构造器<br>super：调用超类方法；调用超类构造器 </p>
+<p>多态：一个对象变量可以指示多种实际类型的现象。<br>编译时多态：重载<br>运行时多态：重写<br>实现机制：<br>静态分派:所有依赖静态类型来定位方法执行版本的分派动作。静态分派发生在编译阶段，因此确定静态分派的动作实际上不是由虚拟机来执行的，而是由编译器来完成。（编译时多态）<br>动态分派：在运行期根据实际类型确定方法执行版本的分派动作。（运行时多态） </p>
+<p>动态绑定：在运行时能够自动选择调用哪个方法的现象<br>final类：不允许扩展 </p>
 
       
 
@@ -251,7 +220,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">mysql</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
         		</li>
       		
 		</ul>
@@ -307,7 +276,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/04/01/mysql%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/04/08/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -321,18 +290,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2020/04/01/delete%E5%92%8Ctruncate%E7%9A%84%E5%8C%BA%E5%88%AB/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          delete和truncate的区别
-        
-      </div>
-    </a>
   
-  
-    <a href="/2020/04/01/%E6%A0%87%E8%AF%86%E5%88%97%E9%97%AE%E9%A2%98/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">标识列问题</div>
+    <a href="/2020/04/08/java%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">java中的数据类型</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -359,7 +319,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    目录，不存在的…
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#封装"><span class="toc-number">1.</span> <span class="toc-text">封装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#类之间的关系"><span class="toc-number">2.</span> <span class="toc-text">类之间的关系</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方法参数"><span class="toc-number">3.</span> <span class="toc-text">方法参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#类设计技巧"><span class="toc-number">4.</span> <span class="toc-text">类设计技巧</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#继承"><span class="toc-number">5.</span> <span class="toc-text">继承</span></a></li></ol>
                     </div>
                 </span>
             </div>

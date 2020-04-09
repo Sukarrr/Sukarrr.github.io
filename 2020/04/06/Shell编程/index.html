@@ -6,22 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>mysql中的事务 | Hexo</title>
+  <title>Shell编程 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="事务：一组原子性的SQL查询">
+  <meta name="description" content="Shell 是一个命令行解释器，它为用户提供了一个向 Linux 内核发送请求以便运行程序的界面系统级程序，用户可以用 Shell 来启动、挂起、停止甚至是编写一些程序">
 <meta property="og:type" content="article">
-<meta property="og:title" content="mysql中的事务">
-<meta property="og:url" content="http://yoursite.com/2020/04/01/mysql%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1/index.html">
+<meta property="og:title" content="Shell编程">
+<meta property="og:url" content="http://yoursite.com/2020/04/06/Shell%E7%BC%96%E7%A8%8B/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="事务：一组原子性的SQL查询">
+<meta property="og:description" content="Shell 是一个命令行解释器，它为用户提供了一个向 Linux 内核发送请求以便运行程序的界面系统级程序，用户可以用 Shell 来启动、挂起、停止甚至是编写一些程序">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://yoursite.com/assets/shiwugeli.png">
-<meta property="article:published_time" content="2020-04-01T04:30:18.000Z">
-<meta property="article:modified_time" content="2020-04-01T07:24:40.551Z">
+<meta property="article:published_time" content="2020-04-06T03:53:38.000Z">
+<meta property="article:modified_time" content="2020-04-06T06:29:40.866Z">
 <meta property="article:author" content="Sukar">
-<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://yoursite.com/assets/shiwugeli.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -147,65 +145,63 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-mysql中的事务" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-Shell编程" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      mysql中的事务
+      Shell编程
     </h1>
   
 
         
-        <a href="/2020/04/01/mysql%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1/" class="archive-article-date">
-  	<time datetime="2020-04-01T04:30:18.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-01</time>
+        <a href="/2020/04/06/Shell%E7%BC%96%E7%A8%8B/" class="archive-article-date">
+  	<time datetime="2020-04-06T03:53:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-06</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>事务：一组原子性的SQL查询</p>
+        <p>Shell 是一个命令行解释器，它为用户提供了一个向 Linux 内核发送请求以便运行程序的界面系统级程序，用户可以用 Shell 来启动、挂起、停止甚至是编写一些程序 </p>
 <a id="more"></a>
 
+<h3 id="Shell脚本执行方式"><a href="#Shell脚本执行方式" class="headerlink" title="Shell脚本执行方式"></a>Shell脚本执行方式</h3><h4 id="脚本格式要求"><a href="#脚本格式要求" class="headerlink" title="脚本格式要求"></a>脚本格式要求</h4><p>1.脚本以#!/bin/bash 开头<br>2.脚本需要有可执行权限 </p>
+<h4 id="脚本常用执行方式"><a href="#脚本常用执行方式" class="headerlink" title="脚本常用执行方式"></a>脚本常用执行方式</h4><p>chmod 744 myShell.sh<br>./myShell.sh（或者绝对路径） </p>
+<h3 id="shell的变量"><a href="#shell的变量" class="headerlink" title="shell的变量"></a>shell的变量</h3><p>系统变量：$HOME、$PWD、$SHELL、$USER 等等<br>定义变量：变量=值 </p>
 <ul>
-<li><p><strong>事务的ACID属性</strong> </p>
-<ol>
-<li>原子性（atomicity)一个事务必须被视为一个不可分割的最小工作单元，整个事务中的所有操作要么全部提交成功，要么全部失败回滚。 </li>
-<li>一致性（consistency)数据库总是从一个一致性的状态转换到另外一个一致性的状态。（保证事务的完整性，准确性） </li>
-<li>隔离性（isolation)通常来说，一个事务所做的修改在最终提交以前，对其他事务是不可见的。 </li>
-<li>持久性（durability)一旦事务提交，则其所做的修改就会永久保存到数据库中。此时即使系统崩溃，修改的数据也不会丢失。</li>
-</ol>
-</li>
-<li><p><strong>事务的创建</strong> </p>
-<ol>
-<li>隐式事务：事务没有明显的开启和结束标志<br>比如select、insert、update、delete语句</li>
-<li>显式事务<br>前提：必须先设置自动提交功能为禁用<br>步骤1：开启事务<br>set autocommit=0;<br>start transaction;可选的<br>步骤2：编写sql语句<br>步骤3：结束事务<br>commit；提交事务<br>rollback；回滚事务<br>（要结合具体应用场景，mysql只能单独提交或回滚）  </li>
-</ol>
-</li>
-<li><p><strong>各种并发问题</strong>  </p>
-<ul>
-<li>脏读<br>在事务A修改数据之后<strong>提交数据之前</strong>，这时另一个事务B来读取数据，如果不加控制，事务B读取到A修改过数据，之后A回滚，B读取到的内容是临时且无效的，此过程称为脏读Dirty Read。  </li>
-<li>不可重复读<br>对于两个事务A,B，A读取了一个字段，然后B<strong>更新</strong>了该字段之后A再次读取同一字段值就不同了。  </li>
-<li>幻读<br>对于两个事务A,B，A从一个表中读取了一个字段，然后B在该表中<strong>插入</strong>了一些新的行之后，如果A再次读取同一个表就会多出几行  </li>
-</ul>
-</li>
-<li><p><strong>数据库的隔离性</strong>  </p>
-<ul>
-<li>oracle支持的2种事务隔离级别：READ COMMITED（默认）,SERIALIZABLE  </li>
-<li>mysql支持4种事务隔离级别：REPEATABLE READ（默认）<br><img src="/assets/shiwugeli.png" alt="">  </li>
-</ul>
-</li>
-<li><p>查看隔离级别<br>select @@tx_isolation;  </p>
-</li>
-<li><p>设置隔离级别<br>set session|global transaction isolation level 隔离级别;  </p>
-</li>
-<li><p>savepoint的使用</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SET autocommit&#x3D;0;</span><br><span class="line">START TRANSACTION;</span><br><span class="line">sql;</span><br><span class="line">SAVEPOINT a;#设置保存点</span><br><span class="line">sql;</span><br><span class="line">ROLLBACK TO a;#回滚到保存点</span><br></pre></td></tr></table></figure>
-
-</li>
+<li>set 显示当前shell中所有变量 </li>
+<li>unset 变量：撤销变量 </li>
+<li>readonly 变量：声明静态变量，不能unset </li>
+<li>定义变量的规则<br>1)    变量名称可以由字母、数字和下划线组成，但是不能以数字开头。<br>2)    等号两侧不能有空格<br>3)    变量名称一般习惯为大写 </li>
+<li><strong>将命令的返回值赋给变量（重点）</strong><br>1）    A=`ls -la` 反引号，运行里面的命令，并把结果返回给变量 A<br>2）    A=$(ls -la) 等价于反引号 <h3 id="设置环境变量"><a href="#设置环境变量" class="headerlink" title="设置环境变量"></a>设置环境变量</h3></li>
+<li>export 变量名=变量值（将shell变量输出为环境变量） </li>
+<li>source 配置文件（让修改后的配置信息立即生效） </li>
+<li>echo $变量名（查询环境变量的值） <h3 id="位置参数变量"><a href="#位置参数变量" class="headerlink" title="位置参数变量"></a>位置参数变量</h3></li>
+<li>./myshell.sh 100 200 可以在myshell脚本中获取参数信息 </li>
+<li>基本语法<br>$n （功能描述：n 为数字，$0 代表命令本身，$1-$9 代表第一到第九个参数，十以上的参数，十以上的参数需要用大括号包含，如${10}）<br>$* （功能描述：这个变量代表命令行中所有的参数，$*把所有的参数看成一个整体）<br>$@（功能描述：这个变量也代表命令行中所有的参数，不过$@把每个参数区分对待）<br>$#（功能描述：这个变量代表命令行中所有参数的个数） <h3 id="预定义变量"><a href="#预定义变量" class="headerlink" title="预定义变量"></a>预定义变量</h3>$$ （功能描述：当前进程的进程号（PID））<br>$!（功能描述：后台运行的最后一个进程的进程号（PID））<br>$？（功能描述：最后一次执行的命令的返回状态。如果这个变量的值为 0，证明上一个命令正确执行；如果这个变量的值为非 0（具体是哪个数，由命令自己来决定），则证明上一个命令执行不正确） <h3 id="运算符"><a href="#运算符" class="headerlink" title="运算符"></a>运算符</h3></li>
+<li>$((运算式))或$[运算式] </li>
+<li>expr m + n<br>  注意expr运算符间要有空格<br>  expr \*,/,%  乘，除，取余 <h3 id="条件判断"><a href="#条件判断" class="headerlink" title="条件判断"></a>条件判断</h3></li>
+<li>[ condition ]（注意 condition 前后要有空格）<br>非空返回 true，可使用$?验证（0 为 true，&gt;1 为 false）<br>&amp;&amp; 条件满足，执行后面语句 </li>
+<li>常用判断条件<br>= 字符串比较<br>-lt 小于<br>-le 小于等于<br>-eq 等于<br>-gt 大于<br>-ge 大于等于<br>-ne 不等于 </li>
+<li>按照文件权限进行判断<br>-r 有读的权限[ -r 文件 ]<br>-w 有写的权限<br>-x 有执行权限 </li>
+<li>按照文件类型进行判断<br>-f 文件存在并且是一个常规的文件<br>-e 文件存在<br>-d 文件存在并且是一个目录 <h3 id="流程控制"><a href="#流程控制" class="headerlink" title="流程控制"></a>流程控制</h3><h4 id="if判断"><a href="#if判断" class="headerlink" title="if判断"></a>if判断</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if[ 条件判断式 ]</span><br><span class="line">    then </span><br><span class="line">    程序</span><br><span class="line">    elif[ 条件判断式 ]</span><br><span class="line">    then</span><br><span class="line">    程序</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+注意：中括号和条件判断式之间必须有空格 <h4 id="case语句"><a href="#case语句" class="headerlink" title="case语句"></a>case语句</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">case $变量名 in</span><br><span class="line">&quot;值 1&quot;）</span><br><span class="line">如果变量的值等于值 1，则执行程序 1</span><br><span class="line">;;</span><br><span class="line">&quot;值 2&quot;）</span><br><span class="line">如果变量的值等于值 2，则执行程序 2</span><br><span class="line">;;</span><br><span class="line">…省略其他分支…</span><br><span class="line">*）</span><br><span class="line">如果变量的值都不是以上的值，则执行此程序</span><br><span class="line">;;</span><br><span class="line">esac</span><br></pre></td></tr></table></figure>
+<h4 id="for循环"><a href="#for循环" class="headerlink" title="for循环"></a>for循环</h4></li>
+<li>基本语法1<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">for 变量 in 值1 值2 值3…</span><br><span class="line">do</span><br><span class="line">程序</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">for i in &quot;$*&quot;</span><br><span class="line">do </span><br><span class="line">    echo &quot;the num is $i&quot;</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+输入：1 2<br>输出：the num is 1 2<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">for j in &quot;$@&quot;</span><br><span class="line">do</span><br><span class="line">    echo &quot;the num is $j&quot; </span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+输入：1 2<br>输出：the num is 1<br>the num is 2 </li>
+<li>基本语法2 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">for ((初始值;循环控制条件;变量变化))</span><br><span class="line">do</span><br><span class="line">程序</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SUM&#x3D;0</span><br><span class="line">for ((i&#x3D;1;i&lt;&#x3D;100;i++&gt;))</span><br><span class="line">do</span><br><span class="line">    SUM&#x3D;$[$SUM+$i]</span><br><span class="line">done</span><br><span class="line">echo &quot;sum&#x3D;$SUM&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="while循环"><a href="#while循环" class="headerlink" title="while循环"></a>while循环</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">while [ 条件判断式 ]</span><br><span class="line">do</span><br><span class="line">    程序</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+<h3 id="read读取控制台输入"><a href="#read读取控制台输入" class="headerlink" title="read读取控制台输入"></a>read读取控制台输入</h3>read [选项][参数]<br>选项：<br>-p：指定读取值时的提示符<br>-t：指定读取值时等待的时间（秒），如果没有在指定的时间内输入，就不再等待了 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">read -t 10 -p &quot;请输入一个数num&#x3D;&quot; NUM </span><br><span class="line">echo &quot;你输入的值是num&#x3D;$NUM&quot;</span><br><span class="line">读取控制台输入一个num值，在10秒内输入</span><br></pre></td></tr></table></figure>
+<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><h4 id="系统函数"><a href="#系统函数" class="headerlink" title="系统函数"></a>系统函数</h4></li>
+<li>basename [pathname] [suffix]<br>功能：返回完整路径最后 / 的部分，常用于获取文件名<br>suffix 为后缀，如果 suffix 被指定了，basename 会将 pathname 或 string 中的 suffix 去掉。 </li>
+<li>dirname 文件绝对路径<br>返回完整路径最后 / 的前面的部分，常用于返回路径部分 <h4 id="自定义函数"><a href="#自定义函数" class="headerlink" title="自定义函数"></a>自定义函数</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">function funname()</span><br><span class="line">&#123;</span><br><span class="line">    Action;</span><br><span class="line">    [return int;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+调用直接写函数名：funname[值] </li>
 </ul>
 
       
@@ -251,7 +247,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">mysql</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Linux</a>
         		</li>
       		
 		</ul>
@@ -307,7 +303,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/04/01/mysql%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/04/06/Shell%E7%BC%96%E7%A8%8B/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -321,18 +317,18 @@
   
 <nav id="article-nav">
   
-    <a href="/2020/04/01/delete%E5%92%8Ctruncate%E7%9A%84%E5%8C%BA%E5%88%AB/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2020/04/08/java%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          delete和truncate的区别
+          java中的数据类型
         
       </div>
     </a>
   
   
-    <a href="/2020/04/01/%E6%A0%87%E8%AF%86%E5%88%97%E9%97%AE%E9%A2%98/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">标识列问题</div>
+    <a href="/2020/04/04/Linux%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Linux目录结构</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -359,7 +355,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    目录，不存在的…
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Shell脚本执行方式"><span class="toc-number">1.</span> <span class="toc-text">Shell脚本执行方式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#脚本格式要求"><span class="toc-number">1.1.</span> <span class="toc-text">脚本格式要求</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#脚本常用执行方式"><span class="toc-number">1.2.</span> <span class="toc-text">脚本常用执行方式</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#shell的变量"><span class="toc-number">2.</span> <span class="toc-text">shell的变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置环境变量"><span class="toc-number">3.</span> <span class="toc-text">设置环境变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#位置参数变量"><span class="toc-number">4.</span> <span class="toc-text">位置参数变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#预定义变量"><span class="toc-number">5.</span> <span class="toc-text">预定义变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#运算符"><span class="toc-number">6.</span> <span class="toc-text">运算符</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#条件判断"><span class="toc-number">7.</span> <span class="toc-text">条件判断</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#流程控制"><span class="toc-number">8.</span> <span class="toc-text">流程控制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#if判断"><span class="toc-number">8.1.</span> <span class="toc-text">if判断</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#case语句"><span class="toc-number">8.2.</span> <span class="toc-text">case语句</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#for循环"><span class="toc-number">8.3.</span> <span class="toc-text">for循环</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#while循环"><span class="toc-number">8.4.</span> <span class="toc-text">while循环</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#read读取控制台输入"><span class="toc-number">9.</span> <span class="toc-text">read读取控制台输入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#函数"><span class="toc-number">10.</span> <span class="toc-text">函数</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#系统函数"><span class="toc-number">10.1.</span> <span class="toc-text">系统函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#自定义函数"><span class="toc-number">10.2.</span> <span class="toc-text">自定义函数</span></a></li></ol></li></ol>
                     </div>
                 </span>
             </div>
