@@ -6,17 +6,17 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>delete和truncate的区别 | Hexo</title>
+  <title>sql优化 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="MySQL中有两种删除表中记录的方法:(1)delete from语句，(2)truncate table语句。">
+  <meta name="description" content="————————深入浅出mysql笔记——————————">
 <meta property="og:type" content="article">
-<meta property="og:title" content="delete和truncate的区别">
-<meta property="og:url" content="http://yoursite.com/2020/04/01/delete%E5%92%8Ctruncate%E7%9A%84%E5%8C%BA%E5%88%AB/index.html">
+<meta property="og:title" content="sql优化">
+<meta property="og:url" content="http://yoursite.com/2020/04/15/sql%E4%BC%98%E5%8C%96/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="MySQL中有两种删除表中记录的方法:(1)delete from语句，(2)truncate table语句。">
+<meta property="og:description" content="————————深入浅出mysql笔记——————————">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2020-04-01T07:03:13.000Z">
-<meta property="article:modified_time" content="2020-04-01T07:21:36.843Z">
+<meta property="article:published_time" content="2020-04-15T05:17:33.000Z">
+<meta property="article:modified_time" content="2020-04-15T07:33:09.210Z">
 <meta property="article:author" content="Sukar">
 <meta property="article:tag" content="mysql">
 <meta name="twitter:card" content="summary">
@@ -145,36 +145,91 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-delete和truncate的区别" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-sql优化" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      delete和truncate的区别
+      sql优化
     </h1>
   
 
         
-        <a href="/2020/04/01/delete%E5%92%8Ctruncate%E7%9A%84%E5%8C%BA%E5%88%AB/" class="archive-article-date">
-  	<time datetime="2020-04-01T07:03:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-01</time>
+        <a href="/2020/04/15/sql%E4%BC%98%E5%8C%96/" class="archive-article-date">
+  	<time datetime="2020-04-15T05:17:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-15</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>MySQL中有两种删除表中记录的方法:<br>(1)delete from语句，<br>(2)truncate table语句。  </p>
+        <p>————————深入浅出mysql笔记——————————</p>
 <a id="more"></a>
 
-<ol>
-<li>delete可以加WHERE条件，TRUNCATE不能加    </li>
-<li>delete可以返回被删除的记录数，truncate返回0  </li>
-<li>假如删除的表中有自增长列，如果用delete删除再插入数据，自增长列从断点开始，truncate删除后再插入数据自增长列从1开始  </li>
-<li>truncate删除效率高一点点  </li>
-<li>在使用事务时有区别，delete在事务中回滚可以撤销删除数据，truncate在事务中就算回滚也会完全执行。</li>
-</ol>
+<h3 id="优化步骤"><a href="#优化步骤" class="headerlink" title="优化步骤"></a>优化步骤</h3><h4 id="1-通过show-status-了解sql执行频率"><a href="#1-通过show-status-了解sql执行频率" class="headerlink" title="1.通过show status 了解sql执行频率"></a>1.通过show status 了解sql执行频率</h4><p>show [session|global] status 默认是session参数 </p>
+<p>统计参数： </p>
+<ul>
+<li>Com_select：执行 select 操作的次数，一次查询只累加 1。  </li>
+<li>Com_insert：执行 INSERT 操作的次数，对于批量插入的 INSERT 操作，只累加一次。  </li>
+<li>Com_update：执行 UPDATE 操作的次数 </li>
+<li>Com_delete：执行 DELETE 操作的次数 </li>
+</ul>
+<p>只针对InnoDB的参数： </p>
+<ul>
+<li>Innodb_rows_read：select 查询返回的行数。 </li>
+<li>Innodb_rows_inserted：执行 INSERT 操作插入的行数。 </li>
+<li>Innodb_rows_updated：执行 UPDATE 操作更新的行数。  </li>
+<li>Innodb_rows_deleted：执行 DELETE 操作删除的行数。  </li>
+</ul>
+<p>事务性参数：<br>Com_commit和Com_rollback可以了解事务提交和回滚的情况 </p>
+<p>数据库基本情况： </p>
+<ul>
+<li>Connections：试图连接MySQL服务器的次数 </li>
+<li>Uptime：服务器工作时间 </li>
+<li>Slow_queries：慢查询的次数 </li>
+</ul>
+<h4 id="2-定位效率低的sql语句"><a href="#2-定位效率低的sql语句" class="headerlink" title="2.定位效率低的sql语句"></a>2.定位效率低的sql语句</h4><ul>
+<li>通过慢查询日志定位 </li>
+<li>慢查询日志在查询结束后才记录，可以使用show processlist命令查看当前MySQL的线程 </li>
+</ul>
+<h4 id="3-通过EXPLAIN分析低效sql执行计划"><a href="#3-通过EXPLAIN分析低效sql执行计划" class="headerlink" title="3.通过EXPLAIN分析低效sql执行计划"></a>3.通过EXPLAIN分析低效sql执行计划</h4><ul>
+<li>select_type：SELECT类型，常见取值有SIMPLE（简单表，即不使用表连接或子查询）、PRIMARY（主查询，即外层查询）、UNION（UNION中的第二个或后面的查询语句）、SUBQUERY（子查询中的第一个SELECT） </li>
+<li>table：输出结果集的表 </li>
+<li>type： 表示表的连接类型，性能由好到差为system（表中仅有一行，即常量表）、const（单表中最多一个匹配行，例如primary key或unique index）、eq_ref（对于前一行，在此表中只查询一条记录，多表连接中使用primary key或unique index）、ref（与eq_ref类似，但使用普通索引）、ref_or_null（与ref类似，区别在于条件中包含对null的查询）、index_merge（索引合并优化）、unique_subquery（in的后面是一个查询主键字段的子查询）、index_subquery（与前者类似，区别在于in后面的查询非唯一索引字段的子查询）、range（单表中的范围查询）、index（对于前面每一行，都通过查询索引得到数据）、all（对于前面每一行都通过权标扫描得到数据） </li>
+<li>possible_key：表示查询时，可能用到的索引 </li>
+<li>key：实际用到的索引 </li>
+<li>key_len：索引字段长度 </li>
+<li>rows：扫描行的数量 </li>
+<li>Extra：执行情况的说明和描述 </li>
+</ul>
+<h4 id="4-确定问题并采取相应优化措施"><a href="#4-确定问题并采取相应优化措施" class="headerlink" title="4.确定问题并采取相应优化措施"></a>4.确定问题并采取相应优化措施</h4><p>索引可以大大提高数据库的访问速度 </p>
+<h3 id="索引问题"><a href="#索引问题" class="headerlink" title="索引问题"></a>索引问题</h3><p>使用索引：<br>1.对于创建的多列索引，只要条件中用到了最左边的列，索引一般会被使用<br>2.对于like查询，后面如果是常量并且只有%不在第一个字符，索引才可能被使用<br>3.对于大的文本搜索，使用全文索引而不使用like’%…%’<br>4.如果列名是索引，使用column_name is null 将使用索引。 </p>
+<p>不使用索引：<br>1.MySQL估计使用索引比全表扫描慢<br>2.MEMORY/HEAP表的where条件中不使用”=”进行索引列<br>3.用or分隔开的条件，or中一个条件中的列没有索引，则不会使用索引<br>4.复合索引，如果不是索引第一列则这个索引不会被采用<br>5.like以%开头<br>6.如果列类型是字符串，where条件中把字符常量值用引号引起来，否则不会用到这个列上的索引 </p>
+<p>查看索引的使用情况：<br>如果索引正在工作，Handler_read_key的值将很高，这个值代表了一个行被索引值读的次数<br>Handler_read_rnd_next 的值高则意味着查询运行低效，并且应该建立索引补救。这个值 的含义是在数据文件中读下一行的请求数。 </p>
+<h3 id="两个简单的优化方法"><a href="#两个简单的优化方法" class="headerlink" title="两个简单的优化方法"></a>两个简单的优化方法</h3><h4 id="1-定期分析表和检查表"><a href="#1-定期分析表和检查表" class="headerlink" title="1.定期分析表和检查表"></a>1.定期分析表和检查表</h4><p>ANALYZE [LOCAL | NO_WRITE_TO_BINLOG] TABLE tbl_name [, tbl_name] …<br>CHECK TABLE tbl_name [, tbl_name] … [option] … option = {QUICK | FAST | MEDIUM | EXTENDED<br>| CHANGED}  </p>
+<h4 id="2-定期优化表"><a href="#2-定期优化表" class="headerlink" title="2.定期优化表"></a>2.定期优化表</h4><p>OPTIMIZE [LOCAL | NO_WRITE_TO_BINLOG] TABLE tbl_name [, tbl_name] …<br>OPTIMIZE TABLE 命令只对 MyISAM、BDB 和 InnoDB表起作用。  </p>
+<h3 id="常用SQL优化"><a href="#常用SQL优化" class="headerlink" title="常用SQL优化"></a>常用SQL优化</h3><h4 id="大批量插入数据"><a href="#大批量插入数据" class="headerlink" title="大批量插入数据"></a>大批量插入数据</h4><p>MyISAM：DISABLE KEYS 和 ENABLE KEYS 用来打开或者关闭 MyISAM 表非唯一索引的更新，可以提高导入效率 </p>
+<p>InnoDB：<br>1.将导入的数据按照主键的顺序排列，可以有效地提高导入数据的效率。<br>2.在导入数据前执行 SET UNIQUE_CHECKS=0，关闭唯一性校验，在导入结束后执行 SET UNIQUE_CHECKS=1，恢复唯一性校验，可以提高导入的效率。<br>3.如果应用使用自动提交的方式，建议在导入前执行 SET AUTOCOMMIT=0，关闭自动提交，导入结束后再执行 SET AUTOCOMMIT=1，打开自动提交，也可以提高导入的效率  </p>
+<h4 id="优化INSERT语句"><a href="#优化INSERT语句" class="headerlink" title="优化INSERT语句"></a>优化INSERT语句</h4><ul>
+<li>多个值表的INSERT语句比分开执行单个INSERT语句快 </li>
+<li>如果从不同客户插入很多行，能通过使用INSERT DELAYED语句得到更高的速度DELAYED 的含义是让 INSERT 语句马上执行，其实数据都被放在内存的队列中，并没有 真正写入磁盘，这比每条语句分别插入要快的多 </li>
+<li>将索引和数据文件分在不同的磁盘上存放 </li>
+<li>MyISAM表进行批量插入可以增加bulk_insert_buffer_size变量值的方法来提高速度 </li>
+<li>当从一个文本文件装载一个表时，使用LOAD DATA INFILE </li>
+</ul>
+<h4 id="优化GROUP-BY子句"><a href="#优化GROUP-BY子句" class="headerlink" title="优化GROUP BY子句"></a>优化GROUP BY子句</h4><p>如果查询包括 GROUP BY 但用户想要避免排序结果的消耗，则可以指定 ORDER BY NULL 禁止排序 </p>
+<h4 id="优化ORDER-BY子句"><a href="#优化ORDER-BY子句" class="headerlink" title="优化ORDER BY子句"></a>优化ORDER BY子句</h4><p>可以用索引满足ORDER BY子句 </p>
+<p>不使用索引： </p>
+<ul>
+<li>order by 的字段混合ASC和DESC </li>
+<li>用于查询行的关键字与ORDER中所使用的不相同 </li>
+<li>对不同的关键字使用ORDER BY </li>
+</ul>
+<h4 id="优化嵌套查询"><a href="#优化嵌套查询" class="headerlink" title="优化嵌套查询"></a>优化嵌套查询</h4><p>子查询有时可以被更有效的连接（JOIN）代替<br>MySQL不需要在内存中创建临时表来完成这个逻辑上的需要两个步骤的查询工作 </p>
+<h4 id="优化OR条件"><a href="#优化OR条件" class="headerlink" title="优化OR条件"></a>优化OR条件</h4><p>OR子句如果要利用索引，每个条件列都必须用到索引 </p>
+<h4 id="使用SQL提示"><a href="#使用SQL提示" class="headerlink" title="使用SQL提示"></a>使用SQL提示</h4><p>USE INDEX<br>INGNORE INDEX<br>FORCE INDEX </p>
 
       
 
@@ -265,7 +320,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/04/01/delete%E5%92%8Ctruncate%E7%9A%84%E5%8C%BA%E5%88%AB/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/04/15/sql%E4%BC%98%E5%8C%96/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -279,18 +334,18 @@
   
 <nav id="article-nav">
   
-    <a href="/2020/04/01/%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B%E5%92%8C%E5%87%BD%E6%95%B0/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2020/04/16/MySQL%E4%B8%AD%E9%94%81%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          存储过程和函数
+          MySQL中锁相关问题
         
       </div>
     </a>
   
   
-    <a href="/2020/04/01/mysql%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">mysql中的事务</div>
+    <a href="/2020/04/15/SQL-Mode%E5%8F%8A%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">SQL Mode及相关问题</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -317,7 +372,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    目录，不存在的…
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#优化步骤"><span class="toc-number">1.</span> <span class="toc-text">优化步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-通过show-status-了解sql执行频率"><span class="toc-number">1.1.</span> <span class="toc-text">1.通过show status 了解sql执行频率</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-定位效率低的sql语句"><span class="toc-number">1.2.</span> <span class="toc-text">2.定位效率低的sql语句</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-通过EXPLAIN分析低效sql执行计划"><span class="toc-number">1.3.</span> <span class="toc-text">3.通过EXPLAIN分析低效sql执行计划</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-确定问题并采取相应优化措施"><span class="toc-number">1.4.</span> <span class="toc-text">4.确定问题并采取相应优化措施</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#索引问题"><span class="toc-number">2.</span> <span class="toc-text">索引问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#两个简单的优化方法"><span class="toc-number">3.</span> <span class="toc-text">两个简单的优化方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-定期分析表和检查表"><span class="toc-number">3.1.</span> <span class="toc-text">1.定期分析表和检查表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-定期优化表"><span class="toc-number">3.2.</span> <span class="toc-text">2.定期优化表</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#常用SQL优化"><span class="toc-number">4.</span> <span class="toc-text">常用SQL优化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#大批量插入数据"><span class="toc-number">4.1.</span> <span class="toc-text">大批量插入数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#优化INSERT语句"><span class="toc-number">4.2.</span> <span class="toc-text">优化INSERT语句</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#优化GROUP-BY子句"><span class="toc-number">4.3.</span> <span class="toc-text">优化GROUP BY子句</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#优化ORDER-BY子句"><span class="toc-number">4.4.</span> <span class="toc-text">优化ORDER BY子句</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#优化嵌套查询"><span class="toc-number">4.5.</span> <span class="toc-text">优化嵌套查询</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#优化OR条件"><span class="toc-number">4.6.</span> <span class="toc-text">优化OR条件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#使用SQL提示"><span class="toc-number">4.7.</span> <span class="toc-text">使用SQL提示</span></a></li></ol></li></ol>
                     </div>
                 </span>
             </div>

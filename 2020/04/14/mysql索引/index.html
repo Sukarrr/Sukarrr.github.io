@@ -6,20 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>delete和truncate的区别 | Hexo</title>
+  <title>mysql索引 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="MySQL中有两种删除表中记录的方法:(1)delete from语句，(2)truncate table语句。">
+  <meta name="description" content="————————深入浅出mysql笔记——————————">
 <meta property="og:type" content="article">
-<meta property="og:title" content="delete和truncate的区别">
-<meta property="og:url" content="http://yoursite.com/2020/04/01/delete%E5%92%8Ctruncate%E7%9A%84%E5%8C%BA%E5%88%AB/index.html">
+<meta property="og:title" content="mysql索引">
+<meta property="og:url" content="http://yoursite.com/2020/04/14/mysql%E7%B4%A2%E5%BC%95/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="MySQL中有两种删除表中记录的方法:(1)delete from语句，(2)truncate table语句。">
+<meta property="og:description" content="————————深入浅出mysql笔记——————————">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2020-04-01T07:03:13.000Z">
-<meta property="article:modified_time" content="2020-04-01T07:21:36.843Z">
+<meta property="og:image" content="http://yoursite.com/assets/hash%E7%B4%A2%E5%BC%95.png">
+<meta property="article:published_time" content="2020-04-14T10:52:02.000Z">
+<meta property="article:modified_time" content="2020-04-15T06:39:13.477Z">
 <meta property="article:author" content="Sukar">
 <meta property="article:tag" content="mysql">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/assets/hash%E7%B4%A2%E5%BC%95.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -145,36 +147,65 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-delete和truncate的区别" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-mysql索引" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      delete和truncate的区别
+      mysql索引
     </h1>
   
 
         
-        <a href="/2020/04/01/delete%E5%92%8Ctruncate%E7%9A%84%E5%8C%BA%E5%88%AB/" class="archive-article-date">
-  	<time datetime="2020-04-01T07:03:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-01</time>
+        <a href="/2020/04/14/mysql%E7%B4%A2%E5%BC%95/" class="archive-article-date">
+  	<time datetime="2020-04-14T10:52:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-14</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>MySQL中有两种删除表中记录的方法:<br>(1)delete from语句，<br>(2)truncate table语句。  </p>
+        <p>————————深入浅出mysql笔记——————————</p>
 <a id="more"></a>
 
-<ol>
-<li>delete可以加WHERE条件，TRUNCATE不能加    </li>
-<li>delete可以返回被删除的记录数，truncate返回0  </li>
-<li>假如删除的表中有自增长列，如果用delete删除再插入数据，自增长列从断点开始，truncate删除后再插入数据自增长列从1开始  </li>
-<li>truncate删除效率高一点点  </li>
-<li>在使用事务时有区别，delete在事务中回滚可以撤销删除数据，truncate在事务中就算回滚也会完全执行。</li>
-</ol>
+<h3 id="设计索引的原则"><a href="#设计索引的原则" class="headerlink" title="设计索引的原则"></a>设计索引的原则</h3><ul>
+<li>适合索引的列是出现在WHERE子句中的列，不是SELECT中的列 </li>
+<li>使用唯一索引，列基数越大，索引的效果越好 </li>
+<li>使用短索引，对字符串列的索引应该指定一个前缀长度 </li>
+<li>利用最左前缀，把最常作为检索或排序的列放在最左，依次递减，组合索引相当于建立了c1，c1c2，c1c2c3三个索引，可以只取c1，c2前几个字符作为索引  </li>
+<li>不要过度索引，索引占用额外磁盘空间，降低读写性能，更新表内容时有时需要重构 </li>
+<li>对于InnoDB存储引擎的表，默认按主键顺序保存，如果没有主键则按唯一索引顺序保存，如果两个都没有，则会自动生成一个内部列按顺序保存 </li>
+</ul>
+<h3 id="BTREE索引与HASH索引"><a href="#BTREE索引与HASH索引" class="headerlink" title="BTREE索引与HASH索引"></a>BTREE索引与HASH索引</h3><p><strong>HASH索引特征：</strong> </p>
+<ul>
+<li>只用于使用=或&lt;=&gt;操作符的等式比较 </li>
+<li>优化器不能使用HASH索引来加速ORDER BY操作 </li>
+<li>不能确定两个值之间有多少行 </li>
+<li>只能使用整个关键字来搜索一行 </li>
+</ul>
+<p><img src="/assets/hash%E7%B4%A2%E5%BC%95.png" alt=""></p>
+<ul>
+<li>keys索引列根据特定算法算出hash值 </li>
+<li>根据计算出的hash值和对应的数据的物理位置组成hash表 </li>
+<li>根据存储位置取得数据 </li>
+<li>最后确定这行数据是否是需要查询的数据 </li>
+</ul>
+<p>采用链表的方式解决冲突，类似于hashmap，查询速度快。 </p>
+<p><strong>BTREE索引：</strong><br>当使用&gt;、&lt;、&gt;=、&lt;=、BETWEEN、!=或者&lt;&gt;，或者 LIKE ‘pattern’（其中’pattern’不以通配符开始）操作符时，都可以使用相关列上的索引。  </p>
+<p>B+Tree相对于B-Tree有几点不同：<br>非叶子节点只存储键值信息。<br>所有叶子节点之间都有一个链指针。<br>数据记录都存放在叶子节点中。 </p>
+<p>聚集索引：数据行的物理顺序与列值（一般是主键的那一列）的逻辑顺序相同。一个表中只能有一个聚集索引。<br>非聚集索引：索引的逻辑顺序与磁盘上行的物理存储顺序不同，一个表中可以拥有多个非聚集索引。 </p>
+<p>非聚集索引叶节点有一个指针指向对应数据库<br>查询列中包含了其他该索引没有覆盖的列，那么他还要进行第二次的查询，查询节点上对应的数据行的数据。 </p>
+<p>聚集索引不要求字段唯一性？<br>如果未使用UNIQUE属性创建聚集索引，数据库引擎将自动向表添加一个4字节uniqueifier列，使每个键唯一。 </p>
+<p>在主键上创建聚集索引的表在数据插入上为什么比主键上创建非聚集索引表速度要慢？<br>聚集索引检查主键的唯一性需遍历所有叶节点的数据行，非聚集索引检查主键唯一性只需遍历索引页（索引上包含了主键值，索引存储空间比实际数据少） </p>
+<h3 id="全文索引"><a href="#全文索引" class="headerlink" title="全文索引"></a>全文索引</h3><p>MySQL5.6以前版本，只有MyISAM支持全文索引<br>MySQL5.6以后版本，MyISAM和InnoDB均支持全文索引<br>只能用于创建CHAR， VARCHAR或 TEXT列 </p>
+<p>全文索引有自己的语法格式，使用match和against关键字<br>match() 函数中指定的列必须和全文索引中指定的列完全相同，否则就会报错 </p>
+<p>使用全文索引：<br>1.测试表中至少要有4条以上的数据，否则会出现意想不到的错误<br>2.全文搜索有两个变量，最小搜索长度和最大搜索长度，搜索数据长度必须在两个变量的区间内<br>两个变量默认值查看：show variables like ‘%ft%’<br>3.停用词列表中的单词将被忽略（指非常普遍的词，如”the”或者”some”）<br>4.MyISAM表对有至少50%行中包含的单词会将其视为停用词<br>5.果需要全文索引的是大量数据，建议先添加数据，再创建索引 </p>
+<h4 id="三种全文索引"><a href="#三种全文索引" class="headerlink" title="三种全文索引"></a>三种全文索引</h4><h5 id="自然语言全文索引"><a href="#自然语言全文索引" class="headerlink" title="自然语言全文索引"></a>自然语言全文索引</h5><p>除双引号以外，没有特殊的运算符<br>如果指定了IN NATURAL LANGUAGE MODE修饰符或未指定修饰符，则全文搜索是自然语言搜索 。 </p>
+<h5 id="布尔全文索引"><a href="#布尔全文索引" class="headerlink" title="布尔全文索引"></a>布尔全文索引</h5><p>可以包含指定要求的运算符<br>IN BOOLEAN MODE修饰符指定一个布尔搜索<br>+和-运算符指示必须存在或不存在一个词，匹配才会发生<br>+代表AND<br>-代表NOT<br>[没有运算符]暗示OR </p>
+<h5 id="查询扩展搜索"><a href="#查询扩展搜索" class="headerlink" title="查询扩展搜索"></a>查询扩展搜索</h5><p>查询扩展搜索是对自然语言搜索的修改。搜索字符串用于执行自然语言搜索。然后，将搜索返回的最相关行中的单词添加到搜索字符串中，然后再次执行搜索。<br>该查询返回第二个搜索中的行。该IN NATURAL LANGUAGE MODE WITH QUERY EXPANSION或WITH QUERY EXPANSION修改指定的查询扩展搜索 </p>
+<p>通过执行两次搜索来工作，其中第二次搜索的搜索短语是原始搜索短语，并与来自第一次搜索的少数几个最相关的文档连接在一起。因此，如果这些文档之一包含单词 “ database ”和单词“ MySQL ”，则第二个搜索将查找包含单词“ MySQL ”的文档， 即使它们不包含单词 “ database ”。 </p>
 
       
 
@@ -265,7 +296,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/04/01/delete%E5%92%8Ctruncate%E7%9A%84%E5%8C%BA%E5%88%AB/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/04/14/mysql%E7%B4%A2%E5%BC%95/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -279,18 +310,18 @@
   
 <nav id="article-nav">
   
-    <a href="/2020/04/01/%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B%E5%92%8C%E5%87%BD%E6%95%B0/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2020/04/15/SQL-Mode%E5%8F%8A%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          存储过程和函数
+          SQL Mode及相关问题
         
       </div>
     </a>
   
   
-    <a href="/2020/04/01/mysql%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">mysql中的事务</div>
+    <a href="/2020/04/13/mysql%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E9%80%89%E6%8B%A9/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">mysql数据类型的选择</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -317,7 +348,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    目录，不存在的…
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#设计索引的原则"><span class="toc-number">1.</span> <span class="toc-text">设计索引的原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BTREE索引与HASH索引"><span class="toc-number">2.</span> <span class="toc-text">BTREE索引与HASH索引</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#全文索引"><span class="toc-number">3.</span> <span class="toc-text">全文索引</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#三种全文索引"><span class="toc-number">3.1.</span> <span class="toc-text">三种全文索引</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#自然语言全文索引"><span class="toc-number">3.1.1.</span> <span class="toc-text">自然语言全文索引</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#布尔全文索引"><span class="toc-number">3.1.2.</span> <span class="toc-text">布尔全文索引</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#查询扩展搜索"><span class="toc-number">3.1.3.</span> <span class="toc-text">查询扩展搜索</span></a></li></ol></li></ol></li></ol>
                     </div>
                 </span>
             </div>

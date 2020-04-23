@@ -6,17 +6,17 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>delete和truncate的区别 | Hexo</title>
+  <title>SQL Mode及相关问题 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="MySQL中有两种删除表中记录的方法:(1)delete from语句，(2)truncate table语句。">
+  <meta name="description" content="————————深入浅出mysql笔记——————————">
 <meta property="og:type" content="article">
-<meta property="og:title" content="delete和truncate的区别">
-<meta property="og:url" content="http://yoursite.com/2020/04/01/delete%E5%92%8Ctruncate%E7%9A%84%E5%8C%BA%E5%88%AB/index.html">
+<meta property="og:title" content="SQL Mode及相关问题">
+<meta property="og:url" content="http://yoursite.com/2020/04/15/SQL-Mode%E5%8F%8A%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="MySQL中有两种删除表中记录的方法:(1)delete from语句，(2)truncate table语句。">
+<meta property="og:description" content="————————深入浅出mysql笔记——————————">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2020-04-01T07:03:13.000Z">
-<meta property="article:modified_time" content="2020-04-01T07:21:36.843Z">
+<meta property="article:published_time" content="2020-04-15T04:46:42.000Z">
+<meta property="article:modified_time" content="2020-04-15T05:15:53.254Z">
 <meta property="article:author" content="Sukar">
 <meta property="article:tag" content="mysql">
 <meta name="twitter:card" content="summary">
@@ -145,36 +145,53 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-delete和truncate的区别" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-SQL-Mode及相关问题" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      delete和truncate的区别
+      SQL Mode及相关问题
     </h1>
   
 
         
-        <a href="/2020/04/01/delete%E5%92%8Ctruncate%E7%9A%84%E5%8C%BA%E5%88%AB/" class="archive-article-date">
-  	<time datetime="2020-04-01T07:03:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-01</time>
+        <a href="/2020/04/15/SQL-Mode%E5%8F%8A%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98/" class="archive-article-date">
+  	<time datetime="2020-04-15T04:46:42.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-15</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>MySQL中有两种删除表中记录的方法:<br>(1)delete from语句，<br>(2)truncate table语句。  </p>
+        <p>————————深入浅出mysql笔记——————————</p>
 <a id="more"></a>
 
-<ol>
-<li>delete可以加WHERE条件，TRUNCATE不能加    </li>
-<li>delete可以返回被删除的记录数，truncate返回0  </li>
-<li>假如删除的表中有自增长列，如果用delete删除再插入数据，自增长列从断点开始，truncate删除后再插入数据自增长列从1开始  </li>
-<li>truncate删除效率高一点点  </li>
-<li>在使用事务时有区别，delete在事务中回滚可以撤销删除数据，truncate在事务中就算回滚也会完全执行。</li>
-</ol>
+<h3 id="SQL-Mode-常见功能"><a href="#SQL-Mode-常见功能" class="headerlink" title="SQL Mode 常见功能"></a>SQL Mode 常见功能</h3><p>1.校验日期数据合法性<br>ANSI模式下，非法日期可以插入，但是值会变为“0000-00-00 00:00:00”，并且系统给出了 warning<br>TRADITIONAL 模式下，直接拒绝插入 </p>
+<p>2.TRADITIONAL等严格模式下，在INSERT或UPDATE过程中，MOD(x,0)会产生错误，非严格模式下返回结果NULL </p>
+<p>3.启用 NO_BACKSLASH_ESCAPES 模式，使反斜线成为普通字符 </p>
+<p>4.启用 PIPES_AS_CONCAT 模式。将“||”视为字符串连接操作符，在 Oracle 等数据 库中，“||”被视为字符串的连接操作符，所以，在其他数据库中含有“||”操作符的 SQL 在 MySQL中将无法执行，为了解决这个问题，MySQL提供了 PIPES_AS_CONCAT 模式。 </p>
+<h3 id="常用的SQLMode"><a href="#常用的SQLMode" class="headerlink" title="常用的SQLMode"></a>常用的SQLMode</h3><table>
+<thead>
+<tr>
+<th>sql_mode值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ANSI</td>
+<td>等同于REAL_AS_FLOAT、PIPES_AS_CONCAT、ANSI_QUOTES、IGNORE_SPACE 和 ANSI 组合模式，这种模式使语法和行为更符合标准的 SQL</td>
+</tr>
+<tr>
+<td>STRICT_TRANS_TABLES</td>
+<td>STRICT_TRANS_TABLES适用于事务表和非事务表，它是严格模式，不允许非法日期， 也不允许超过字段长度的值插入字段中，对于插入不正确的值给出错误而不是警告</td>
+</tr>
+<tr>
+<td>TRADITIONAL</td>
+<td>TRADITIONAL 模式等同于 STRICT_TRANS_TABLES、STRICT_ALL_TABLES、 NO_ZERO_IN_DATE、NO_ZERO_DATE、ERROR_FOR_DIVISION_BY_ZERO、TRADITIONAL 和 NO_AUTO_CREATE_USER 组合模式，所以它也是严格模式，对于插入不正确的值是 给出错误而不是警告。可以应用在事务表和非事务表，用在事务表时，只要出现错误 就会立即回滚</td>
+</tr>
+</tbody></table>
 
       
 
@@ -265,7 +282,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/04/01/delete%E5%92%8Ctruncate%E7%9A%84%E5%8C%BA%E5%88%AB/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/04/15/SQL-Mode%E5%8F%8A%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -279,18 +296,18 @@
   
 <nav id="article-nav">
   
-    <a href="/2020/04/01/%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B%E5%92%8C%E5%87%BD%E6%95%B0/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2020/04/15/sql%E4%BC%98%E5%8C%96/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          存储过程和函数
+          sql优化
         
       </div>
     </a>
   
   
-    <a href="/2020/04/01/mysql%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">mysql中的事务</div>
+    <a href="/2020/04/14/mysql%E7%B4%A2%E5%BC%95/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">mysql索引</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -317,7 +334,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    目录，不存在的…
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#SQL-Mode-常见功能"><span class="toc-number">1.</span> <span class="toc-text">SQL Mode 常见功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#常用的SQLMode"><span class="toc-number">2.</span> <span class="toc-text">常用的SQLMode</span></a></li></ol>
                     </div>
                 </span>
             </div>

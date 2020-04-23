@@ -6,20 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>delete和truncate的区别 | Hexo</title>
+  <title>MySQL中锁相关问题 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="MySQL中有两种删除表中记录的方法:(1)delete from语句，(2)truncate table语句。">
+  <meta name="description" content="参考：《深入浅出mysql》MySQL5.6官方文档">
 <meta property="og:type" content="article">
-<meta property="og:title" content="delete和truncate的区别">
-<meta property="og:url" content="http://yoursite.com/2020/04/01/delete%E5%92%8Ctruncate%E7%9A%84%E5%8C%BA%E5%88%AB/index.html">
+<meta property="og:title" content="MySQL中锁相关问题">
+<meta property="og:url" content="http://yoursite.com/2020/04/16/MySQL%E4%B8%AD%E9%94%81%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="MySQL中有两种删除表中记录的方法:(1)delete from语句，(2)truncate table语句。">
+<meta property="og:description" content="参考：《深入浅出mysql》MySQL5.6官方文档">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2020-04-01T07:03:13.000Z">
-<meta property="article:modified_time" content="2020-04-01T07:21:36.843Z">
+<meta property="og:image" content="http://yoursite.com/assets/%E8%A1%A8%E7%BA%A7%E9%94%81%E5%85%BC%E5%AE%B9%E6%80%A7.png">
+<meta property="og:image" content="http://yoursite.com/assets/%E8%A1%8C%E9%94%81%E5%85%BC%E5%AE%B9%E6%80%A7.png">
+<meta property="article:published_time" content="2020-04-16T11:51:49.000Z">
+<meta property="article:modified_time" content="2020-04-17T03:00:44.603Z">
 <meta property="article:author" content="Sukar">
 <meta property="article:tag" content="mysql">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/assets/%E8%A1%A8%E7%BA%A7%E9%94%81%E5%85%BC%E5%AE%B9%E6%80%A7.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -145,36 +148,95 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-delete和truncate的区别" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-MySQL中锁相关问题" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      delete和truncate的区别
+      MySQL中锁相关问题
     </h1>
   
 
         
-        <a href="/2020/04/01/delete%E5%92%8Ctruncate%E7%9A%84%E5%8C%BA%E5%88%AB/" class="archive-article-date">
-  	<time datetime="2020-04-01T07:03:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-01</time>
+        <a href="/2020/04/16/MySQL%E4%B8%AD%E9%94%81%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98/" class="archive-article-date">
+  	<time datetime="2020-04-16T11:51:49.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-16</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>MySQL中有两种删除表中记录的方法:<br>(1)delete from语句，<br>(2)truncate table语句。  </p>
+        <p>参考：《深入浅出mysql》<br>MySQL5.6官方文档 </p>
 <a id="more"></a>
 
-<ol>
-<li>delete可以加WHERE条件，TRUNCATE不能加    </li>
-<li>delete可以返回被删除的记录数，truncate返回0  </li>
-<li>假如删除的表中有自增长列，如果用delete删除再插入数据，自增长列从断点开始，truncate删除后再插入数据自增长列从1开始  </li>
-<li>truncate删除效率高一点点  </li>
-<li>在使用事务时有区别，delete在事务中回滚可以撤销删除数据，truncate在事务中就算回滚也会完全执行。</li>
-</ol>
+<h3 id="1-内部锁定的方法"><a href="#1-内部锁定的方法" class="headerlink" title="1.内部锁定的方法"></a>1.内部锁定的方法</h3><ul>
+<li>行级锁<br>开销大，加锁慢；会出现死锁；锁定粒度最小，发生锁冲突的概率最低,并发 度也最高。 </li>
+<li>表级锁<br>开销小，加锁快；不会出现死锁；锁定粒度大，发生锁冲突的概率最高,并发 度最低。 </li>
+</ul>
+<p>选择锁定类型<br>表锁优于行级锁： </p>
+<ul>
+<li>该表大多数语句均为读取 </li>
+<li>该表的语句是读和写的混合，其中写是对单行的更新或删除，可通过一次按键读取来获取 </li>
+<li>SELECT与并发INSERT 语句结合，很少有 UPDATE 或 DELETE语句。 </li>
+<li>GROUP BY无需任何编写程序即可对整个表进行 许多扫描或操作。 </li>
+</ul>
+<h3 id="2-MyISAM表锁"><a href="#2-MyISAM表锁" class="headerlink" title="2.MyISAM表锁"></a>2.MyISAM表锁</h3><p>MyISAM 存储引擎只支持表锁，这也是 MySQL 开始几个版本中唯一支持的锁类型。 </p>
+<h4 id="2-1查询表级锁争用情况"><a href="#2-1查询表级锁争用情况" class="headerlink" title="2.1查询表级锁争用情况"></a>2.1查询表级锁争用情况</h4><p>show status like ‘table%’;<br>过检查table_locks_waited和table_locks_immediate状态变量<br>Table_locks_waited的值比较高，则说明存在着较严重的表级锁争用情况。  </p>
+<h4 id="2-2表级锁的锁模式"><a href="#2-2表级锁的锁模式" class="headerlink" title="2.2表级锁的锁模式"></a>2.2表级锁的锁模式</h4><p>表共享读锁（Table Read Lock）和表独占写锁（Table Write Lock）<br><img src="/assets/%E8%A1%A8%E7%BA%A7%E9%94%81%E5%85%BC%E5%AE%B9%E6%80%A7.png" alt=""></p>
+<h4 id="2-3如何加表锁"><a href="#2-3如何加表锁" class="headerlink" title="2.3如何加表锁"></a>2.3如何加表锁</h4><p>MyISAM：<br>执行SELECT前自动给涉及的表加读锁<br>执行更新操作（UPDATE、DELETE、INSERT等）前自动给涉及的表加写锁 </p>
+<p>当使用LOCK TABLES时，不仅需要一次锁定用到的所有表，而且同一个表在SQL语句中出现多少次，就要通过与SQL语句中相同的别名锁定多少次，否则也会出错 </p>
+<h4 id="2-4并发插入"><a href="#2-4并发插入" class="headerlink" title="2.4并发插入"></a>2.4并发插入</h4><p>在一定条件下，MyISAM 表也支持查询和插入操作的并发进行。<br>系统变量concurrent_insert专门用以控制其并发插入的行为，其值 分别可以为0、1或2。  </p>
+<ul>
+<li>设为0时，不允许并发插入 </li>
+<li>设为1时，如果MyISAM表没有空洞则允许一个进程在读表的时候另一个进程从表尾插入记录 </li>
+<li>设为2时，无论MyISAM表中有没有空洞，都允许在表尾并发插入 记录。  </li>
+</ul>
+<h4 id="2-5MyISAM的锁调度"><a href="#2-5MyISAM的锁调度" class="headerlink" title="2.5MyISAM的锁调度"></a>2.5MyISAM的锁调度</h4><p>MyISAM 存储引擎的读锁和写锁是互斥的，读写操作是串行的。当一个进程请求某个MyISAM表的读锁，同时另一进程也请求同一表的写锁，<strong>写进程先获得锁</strong> </p>
+<p>MyISAM不适合大量更新操作和查询操作应用，大量更新操作会造成查询结果很难获得读锁，从而永远阻塞 </p>
+<p>调节MyISAM调度行为 </p>
+<ul>
+<li>指定启动参数low-priority-updates使MyISAM引擎默认给予读请求以优先的权利 </li>
+<li>过执行命令SET LOW_PRIORITY_UPDATES=1，使该连接发出的更新请求优先级降低。  </li>
+<li>指定INSERT、UPDATE、DELETE语句的LOW_PRIORITY属性，降低该语句的优先级。  </li>
+</ul>
+<p>MySQL也提供了一种折中的办法来调节读写冲突，即给系统参数max_write_lock_count 设置一个合适的值，当一个表的读锁达到这个值后，MySQL就暂时将写请求的优先级降低， 给读进程一定获得锁的机会。  </p>
+<h3 id="3-InnoDB锁问题"><a href="#3-InnoDB锁问题" class="headerlink" title="3.InnoDB锁问题"></a>3.InnoDB锁问题</h3><h4 id="3-1获取InnoDB行锁争用的情况"><a href="#3-1获取InnoDB行锁争用的情况" class="headerlink" title="3.1获取InnoDB行锁争用的情况"></a>3.1获取InnoDB行锁争用的情况</h4><p>show status like ‘innodb_row_lock%’; </p>
+<h4 id="3-2InnoDB行锁模式及加锁方法"><a href="#3-2InnoDB行锁模式及加锁方法" class="headerlink" title="3.2InnoDB行锁模式及加锁方法"></a>3.2InnoDB行锁模式及加锁方法</h4><ul>
+<li><p>共享锁（S）：允许一个事务去读一行，阻止其他事务获得相同数据集的排他锁。<br>SELECT * FROM table_name WHERE … LOCK IN SHARE MODE </p>
+</li>
+<li><p>排他锁（X)：允许获得排他锁的事务更新数据，阻止其他事务取得相同数据集的共享读锁和排他写锁。<br>SELECT * FROM table_name WHERE … FOR UPDATE </p>
+</li>
+</ul>
+<p>另外，为了允许行锁和表锁共存，实现多粒度锁机制，InnoDB 还有两种内部使用的意向锁（Intention Locks），这两种意向锁都是表锁。意向锁是 InnoDB 自动加的，不需用户干预。 </p>
+<ul>
+<li>意向共享锁（IS）：事务打算给数据行加行共享锁，事务在给一个数据行加共享锁前 必须先取得该表的 IS 锁。 </li>
+<li>意向排他锁（IX）：事务打算给数据行加行排他锁，事务在给一个数据行加排他锁前 必须先取得该表的 IX 锁。 </li>
+</ul>
+<p>行锁的兼容性<br><img src="/assets/%E8%A1%8C%E9%94%81%E5%85%BC%E5%AE%B9%E6%80%A7.png" alt=""></p>
+<h4 id="3-3InnoDB行锁实现方式"><a href="#3-3InnoDB行锁实现方式" class="headerlink" title="3.3InnoDB行锁实现方式"></a>3.3InnoDB行锁实现方式</h4><p>InnoDB 行锁是通过给索引上的索引项加锁来实现的，只有通过索引条件检索数据，InnoDB 才使用行级锁，否则，InnoDB 将使用表锁 </p>
+<p>1.在不通过索引条件查询的时候，InnoDB确实使用的是表锁，而不是行锁。<br>2.由于 MySQL 的行锁是针对索引加的锁，不是针对记录加的锁，所以虽然是访问不同行 的记录，但是如果是使用相同的索引键，是会出现锁冲突的。<br>3.当表有多个索引的时候，不同的事务可以使用不同的索引锁定不同的行，另外，不论是使用主键索引、唯一索引或普通索引，InnoDB 都会使用行锁来对数据加锁。<br>4.是否使用索引来检索数据是由 MySQL 通过判断不同执行计划的代价来决定的，比如对一些很小的表，它就不会使用索引，这种情况下 InnoDB 将使用表锁，而不是行锁。 </p>
+<h4 id="3-4间隙锁（Next-Key锁）"><a href="#3-4间隙锁（Next-Key锁）" class="headerlink" title="3.4间隙锁（Next-Key锁）"></a>3.4间隙锁（Next-Key锁）</h4><p>对于键值在条件范围内但并不存在的记录，叫做“间隙 （GAP)”，InnoDB 也会对这个“间隙”加锁，这种锁机制就是所谓的间隙锁（Next-Key 锁）。<br>间隙锁（Gap Lock）是Innodb在\color{red}{可重复读}提交下为了解决幻读问题时引入的锁机制。 </p>
+<p>InnoDB 除了通过范围条件加锁时使用间隙锁外，如果使用相等条件请求给一个不存在的记录加锁，InnoDB 也会使用间隙锁。<br>间隙可能跨越单个索引值，多个索引值，甚至为空。</p>
+<p>目的：一方面是为了防止幻读，以满足相关隔离级别的要求；另外一方面，是为了满足其恢复和复制的需要。（防止其他事务插入间隙）  </p>
+<p>特性： </p>
+<ul>
+<li>左开右闭 </li>
+<li>插入过程中访问的对象会增加锁 </li>
+<li>索引上等值查询–给唯一索引加锁的时候升级为行锁 </li>
+<li>索引上等值查询–向右遍历最后一个值不满足查询需求时退化为间隙锁 </li>
+<li>唯一索引上的范围查询会访问到不满足条件的第一个值为止 </li>
+</ul>
+<p>间隙锁可以共存。一个事务进行的间隙锁定不会阻止另一事务对相同的间隙进行间隙锁定。共享和专用间隙锁之间没有区别。它们彼此不冲突，并且执行相同的功能。（不互斥）  </p>
+<p>lock in sharemode会有覆盖索引问题，而用for update会将其他索引一同锁住 </p>
+<p>参考：<a href="https://www.jianshu.com/p/32904ee07e56" target="_blank" rel="noopener">https://www.jianshu.com/p/32904ee07e56</a> </p>
+<h4 id="3-5什么时候使用表锁"><a href="#3-5什么时候使用表锁" class="headerlink" title="3.5什么时候使用表锁"></a>3.5什么时候使用表锁</h4><p>第一种情况：事务需要更新大部分或全部数据，表又比较大，如果使用默认的行锁， 不仅这个事务执行效率低，而且可能造成其他事务长时间锁等待和锁冲突，这种情况下可以考虑使用表锁来提高该事务的执行速度。  </p>
+<p>第二种情况：事务涉及多个表，比较复杂，很可能引起死锁，造成大量事务回滚。这种情况也可以考虑一次性锁定事务涉及的表，从而避免死锁、减少数据库因事务回滚带来的 开销。  </p>
+<p>使用LOCK TABLES可以给InnoDB加表级锁，但表锁由MySQL Server负责，仅当 autocommit=0、 innodb_table_locks=1（默认设置）时，InnoDB 层才能知道 MySQL 加的表锁，MySQL Server 也才能感知 InnoDB 加的行锁，这种情况下，InnoDB 才能自动识别涉及表级锁的死锁。<br>事务结束前不要用UNLOCK TABLES释放表锁，因为UNLOCK TABLES 会隐含地提交事务。 </p>
+<h4 id="3-6关于死锁"><a href="#3-6关于死锁" class="headerlink" title="3.6关于死锁"></a>3.6关于死锁</h4><p>发生死锁后，InnoDB 一般都能自动检测到，并使一个事务释放锁并回退，另一个事务获得 锁，继续完成事务。但在涉及外部锁，或涉及表锁的情况下，InnoDB 并不能完全自动检测 到死锁，这需要通过设置锁等待超时参数 innodb_lock_wait_timeout 来解决。 </p>
+<p>避免死锁：<br>1.如果不同程序并发存取多个表，应尽量约定以相同顺序访问表<br>2.批量处理数据时，先对数据排序，保证每个线程按固定顺序处理记录，可以大大降低死锁<br>3.如果更新记录，应直接申请足够级别的锁，即排他锁，而不应先申请共享锁。因为当用户申请排他锁时，其他事务可能又已经获得了相同 记录的共享锁，从而造成锁冲突，甚至死锁。<br>4.REPEATABLE-READ 隔离级别下，如果两个线程同时对相同条件记录 用 SELECT…FOR UPDATE 加排他锁，在没有符合该条件记录情况下，两个线程都会加锁成功。<br>5.当隔离级别为 READ COMMITTED 时，如果两个线程都先执行 SELECT…FOR UPDATE，判 断是否存在符合条件的记录，如果没有，就插入记录。此时，只有一个线程能插入成功，另一个线程会出现锁等待，当第 1 个线程提交后，第 2个线程会因主键重出错，但虽然这个线程出错了，却会获得一个排他锁！这时如果有第3个线程又来申请排他锁，也会出现死锁。<br>对于这种情况，可以直接做插入操作，然后再捕获主键重异常，或者在遇到主键重错误时，总是执行 ROLLBACK 释放获得的排他锁 </p>
+<p>如果出现死锁，可以用 SHOW INNODB STATUS 命令来确定最后一个死锁产生的原因。 </p>
 
       
 
@@ -265,7 +327,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/04/01/delete%E5%92%8Ctruncate%E7%9A%84%E5%8C%BA%E5%88%AB/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/04/16/MySQL%E4%B8%AD%E9%94%81%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -279,18 +341,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2020/04/01/%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B%E5%92%8C%E5%87%BD%E6%95%B0/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          存储过程和函数
-        
-      </div>
-    </a>
   
-  
-    <a href="/2020/04/01/mysql%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">mysql中的事务</div>
+    <a href="/2020/04/15/sql%E4%BC%98%E5%8C%96/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">sql优化</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -317,7 +370,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    目录，不存在的…
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-内部锁定的方法"><span class="toc-number">1.</span> <span class="toc-text">1.内部锁定的方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-MyISAM表锁"><span class="toc-number">2.</span> <span class="toc-text">2.MyISAM表锁</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1查询表级锁争用情况"><span class="toc-number">2.1.</span> <span class="toc-text">2.1查询表级锁争用情况</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2表级锁的锁模式"><span class="toc-number">2.2.</span> <span class="toc-text">2.2表级锁的锁模式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3如何加表锁"><span class="toc-number">2.3.</span> <span class="toc-text">2.3如何加表锁</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-4并发插入"><span class="toc-number">2.4.</span> <span class="toc-text">2.4并发插入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-5MyISAM的锁调度"><span class="toc-number">2.5.</span> <span class="toc-text">2.5MyISAM的锁调度</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-InnoDB锁问题"><span class="toc-number">3.</span> <span class="toc-text">3.InnoDB锁问题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1获取InnoDB行锁争用的情况"><span class="toc-number">3.1.</span> <span class="toc-text">3.1获取InnoDB行锁争用的情况</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2InnoDB行锁模式及加锁方法"><span class="toc-number">3.2.</span> <span class="toc-text">3.2InnoDB行锁模式及加锁方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3InnoDB行锁实现方式"><span class="toc-number">3.3.</span> <span class="toc-text">3.3InnoDB行锁实现方式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-4间隙锁（Next-Key锁）"><span class="toc-number">3.4.</span> <span class="toc-text">3.4间隙锁（Next-Key锁）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-5什么时候使用表锁"><span class="toc-number">3.5.</span> <span class="toc-text">3.5什么时候使用表锁</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-6关于死锁"><span class="toc-number">3.6.</span> <span class="toc-text">3.6关于死锁</span></a></li></ol></li></ol>
                     </div>
                 </span>
             </div>
